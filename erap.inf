@@ -1,0 +1,17 @@
+[Defines]
+    INF_VERSION = 0x0001001B
+    MODULE_TYPE = UEFI_APPLICATION
+    BASE_NAME = erap
+    FILE_GUID = 2245C9C5-5DF3-48A1-84F5-D4E99AE62EF7
+    VERSION_STRING = "Alpha 0.1"
+    ENTRY_POINT = erap_Entry
+
+[Sources]
+    src/erap.c
+
+[Packages]
+    MdePkg/MdePkg.dec
+
+[LibraryClasses]
+    UefiApplicationEntryPoint
+    UefiLib
