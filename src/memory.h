@@ -3,7 +3,7 @@
 
 static
 CHAR16 *
-erap_GetMemoryTypeString( UINT32 type )
+erap_GetMemoryTypeString( EFI_MEMORY_TYPE type )
 {
     switch (type)
     {

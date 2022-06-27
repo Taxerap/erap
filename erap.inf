@@ -8,6 +8,14 @@
 
 [Sources]
     src/erap.c
+    src/lib/container/ucs2_string.c
+    src/lib/container/vector.c
+    src/lib/data/memory.c
+    src/lib/data/ucs2.c
+
+[BuildOptions]
+    MSFT:*_*_*_CC_FLAGS = /I$(PLATFORM_DIR)/vendor /std:c17
+    GCC:*_*_*_CC_FLAGS = -I$(PLATFORM_DIR)/vendor -std=c17
 
 [Packages]
     MdePkg/MdePkg.dec
