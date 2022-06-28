@@ -22,7 +22,7 @@
 *                                                                                                *
 **************************************************************************************************/
 
-#include "memory.h"
+#include "debug/memory_type.h"
 #include "lib/data/memory.h"
 #include "lib/data/ucs2.h"
 #include "lib/container/ucs2_string.h"
