@@ -1,7 +1,7 @@
 # Erap
 
 Erap is a multiboot-compatible UEFI bootloader.  
-It's mainly used by [TaXoS](https://github.com/Taxerap/TaXoS) though...
+It's mainly used by [TaXoS](https://github.com/Taxerap/TaXoS) though.
 
 ## Licensing
 

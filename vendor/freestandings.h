@@ -2,6 +2,7 @@
 #define ERAP_FREESTANDINGS_H
 
 // This header contains the freestanding headers defined in the C standard.
+// <stdnoreturn.h> is excluded since it's deprecated in C2x.
 
 #include <float.h>
 #include <iso646.h>
