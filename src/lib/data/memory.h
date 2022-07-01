@@ -36,18 +36,10 @@ erap_Memory_ReAlloc( EFI_MEMORY_TYPE type, UINTN preserve, VOID *old, UINTN new_
 VOID
 erap_Memory_Free( VOID *ptr );
 
-///
-/// \brief Compare memory
-///
-/// Compare two sections of memories.
-///
-/// \param lhs One section of memory
-/// \param rhs Another section of memory
-/// \param count Number of bytes to compare
-///
-/// \return 0 if two memories are euqal, nonzero otherwise
-///
 INTN
-erap_Memory_MemCmp( const VOID *lhs, const VOID *rhs, UINTN count );
+erap_Memory_MemCmp( CONST VOID *lhs, CONST VOID *rhs, UINTN count );
+
+VOID
+erap_Memory_MemCpy( VOID *dest, CONST VOID *src, UINTN length );
 
 #endif // !ERAP_LIB_DATA_MEMORY_H

@@ -37,7 +37,7 @@ erap_Memory_Malloc( EFI_MEMORY_TYPE type, UINTN size )
 }
 
 VOID *
-erap_Memory_ReAlloc( EFI_MEMORY_TYPE type, UINTN preserve, IN VOID *old, UINTN new_size )
+erap_Memory_ReAlloc( EFI_MEMORY_TYPE type, UINTN preserve, VOID *old, UINTN new_size )
 {
     VOID *result = NULL;
 
@@ -55,12 +55,26 @@ erap_Memory_Free( VOID *ptr )
 }
 
 INTN
-erap_Memory_MemCmp( IN const VOID *lhs, IN const VOID *rhs, UINTN count )
+erap_Memory_MemCmp( CONST VOID *lhs, CONST VOID *rhs, UINTN count )
 {
-    const unsigned char *lhs_p = lhs, *rhs_p = rhs;
+    CONST UINT8 *lhs_p = lhs, *rhs_p = rhs;
     for (UINTN i = 0; i < count; i++)
         if (lhs_p[i] != rhs_p[i])
             return 1;
 
     return 0;
+}
+
+VOID
+erap_Memory_MemCpy( VOID *dest, CONST VOID *src, UINTN length )
+{
+    // Even though UEFI Spec 2.9 said:
+    /*
+        ...The contents of the Destination buffer on exit from this service must match the contents of the Source
+        buffer on entry to this service. Due to potential overlaps, the contents of the Source buffer may be 
+        modified by this service...
+        (Section 7.5 <Miscellaneous Boot Services>: EFI_BOOT_SERVICES.CopyMem())
+    */
+    // ...it is safe to cast src to non-CONST since InternalMemCopyMem() from Edk2 has 'src' defined as CONST.
+    gBS->CopyMem(dest, (VOID *) src, length);
 }

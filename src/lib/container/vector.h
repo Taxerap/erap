@@ -31,7 +31,7 @@
 
 typedef VOID (*erap_VectorFreeFunc)( VOID * );
 typedef VOID (*erap_VectorWalkFunc)( VOID * );
-typedef BOOLEAN (*erap_VectorCmpFunc)( const VOID *, const VOID * );
+typedef BOOLEAN (*erap_VectorCmpFunc)( CONST VOID *, CONST VOID * );
 
 typedef struct erap_Vector
 {
@@ -39,7 +39,7 @@ typedef struct erap_Vector
     UINTN capacity;
     UINTN length;
     erap_VectorFreeFunc free_func;
-    VOID *ptr;
+    alignas(8) VOID *ptr;
 } erap_Vector;
 
 ///
@@ -64,8 +64,8 @@ erap_Vector_Create( UINTN elem_size, erap_VectorFreeFunc free_func );
 ///
 /// \return Pointer to the first element
 ///
-void *
-erap_Vector_First( const erap_Vector *vec );
+VOID *
+erap_Vector_First( CONST erap_Vector *vec );
 
 ///
 /// \brief Get the last element
@@ -76,8 +76,8 @@ erap_Vector_First( const erap_Vector *vec );
 ///
 /// \return Pointer to the last element
 ///
-void *
-erap_Vector_Last( const erap_Vector *vec );
+VOID *
+erap_Vector_Last( CONST erap_Vector *vec );
 
 ///
 /// \brief Get the indexed element
@@ -90,8 +90,8 @@ erap_Vector_Last( const erap_Vector *vec );
 ///
 /// \return Pointer to the location after index
 ///
-void *
-erap_Vector_PtrAt( const erap_Vector *vec, UINTN index );
+VOID *
+erap_Vector_PtrAt( CONST erap_Vector *vec, UINTN index );
 
 ///
 /// \brief Find an element in the vector
@@ -104,8 +104,8 @@ erap_Vector_PtrAt( const erap_Vector *vec, UINTN index );
 ///
 /// \return Pointer to the found element, NULL otherwise.
 ///
-void *
-erap_Vector_Find( const erap_Vector *vec, const void *data, erap_VectorCmpFunc cmp );
+VOID *
+erap_Vector_Find( CONST erap_Vector *vec, CONST VOID *data, erap_VectorCmpFunc cmp );
 
 ///
 /// \brief Expand the vector
@@ -114,7 +114,7 @@ erap_Vector_Find( const erap_Vector *vec, const void *data, erap_VectorCmpFunc c
 ///
 /// \param vec Vector to expand
 ///
-void
+VOID
 erap_Vector_Expand( erap_Vector *vec );
 
 ///
@@ -125,7 +125,7 @@ erap_Vector_Expand( erap_Vector *vec );
 /// \param vec Vector to expand
 /// \param size Target size for expanding
 ///
-void
+VOID
 erap_Vector_ExpandUntil( erap_Vector *vec, UINTN size );
 
 ///
@@ -136,7 +136,7 @@ erap_Vector_ExpandUntil( erap_Vector *vec, UINTN size );
 /// \param vec Vector to walk
 /// \param func Function for walking
 ///
-void
+VOID
 erap_Vector_Walk( erap_Vector *vec, erap_VectorWalkFunc func );
 
 ///
@@ -146,7 +146,7 @@ erap_Vector_Walk( erap_Vector *vec, erap_VectorWalkFunc func );
 ///
 /// \param vec Vector to clear
 ///
-void
+VOID
 erap_Vector_Clear( erap_Vector *vec );
 
 ///
@@ -156,7 +156,7 @@ erap_Vector_Clear( erap_Vector *vec );
 ///
 /// \param vec Vector to shrink
 ///
-void
+VOID
 erap_Vector_ShrinkToFit( erap_Vector *vec );
 
 ///
@@ -169,8 +169,8 @@ erap_Vector_ShrinkToFit( erap_Vector *vec );
 /// \param index Index to insert
 /// \param elem Element to insert
 ///
-void
-erap_Vector_Insert( erap_Vector *vec, UINTN index, const void *elem );
+VOID
+erap_Vector_Insert( erap_Vector *vec, UINTN index, CONST VOID *elem );
 
 ///
 /// \brief Replace an element
@@ -182,8 +182,8 @@ erap_Vector_Insert( erap_Vector *vec, UINTN index, const void *elem );
 /// \param index Index to replace
 /// \param elem Element to replace
 ///
-void
-erap_Vector_Replace( erap_Vector *vec, UINTN index, const void *elem );
+VOID
+erap_Vector_Replace( erap_Vector *vec, UINTN index, CONST VOID *elem );
 
 ///
 /// \brief Delete an element
@@ -194,7 +194,7 @@ erap_Vector_Replace( erap_Vector *vec, UINTN index, const void *elem );
 /// \param vec Vector to operate
 /// \param index Index to delete
 ///
-void
+VOID
 erap_Vector_Delete( erap_Vector *vec, UINTN index );
 
 ///
@@ -208,8 +208,8 @@ erap_Vector_Delete( erap_Vector *vec, UINTN index );
 /// \param index Index to take out
 /// \param ptr_retrieve Pointer to retrieve the result
 ///
-void
-erap_Vector_Take( erap_Vector *vec, UINTN index, void *ptr_retrieve );
+VOID
+erap_Vector_Take( erap_Vector *vec, UINTN index, VOID *ptr_retrieve );
 
 ///
 /// \brief Push an element
@@ -219,8 +219,8 @@ erap_Vector_Take( erap_Vector *vec, UINTN index, void *ptr_retrieve );
 /// \param vec Vector to push into
 /// \param elem Element to be pushed
 ///
-void
-erap_Vector_Push( erap_Vector *vec, const void *elem );
+VOID
+erap_Vector_Push( erap_Vector *vec, CONST VOID *elem );
 
 ///
 /// \brief Pop the last element of vector
@@ -231,8 +231,8 @@ erap_Vector_Push( erap_Vector *vec, const void *elem );
 /// \param vec Vector to pop out
 /// \param ptr_retrieve Pointer to retrieve the result
 ///
-void
-erap_Vector_Pop( erap_Vector *vec, void *ptr_retrieve );
+VOID
+erap_Vector_Pop( erap_Vector *vec, VOID *ptr_retrieve );
 
 ///
 /// \brief Push an element to front
@@ -242,8 +242,8 @@ erap_Vector_Pop( erap_Vector *vec, void *ptr_retrieve );
 /// \param vec Vector to push into
 /// \param elem Element to be pushed
 ///
-void
-erap_Vector_Push_Front( erap_Vector *vec, const void *elem );
+VOID
+erap_Vector_Push_Front( erap_Vector *vec, CONST VOID *elem );
 
 ///
 /// \brief Pop the first element of vector
@@ -254,8 +254,8 @@ erap_Vector_Push_Front( erap_Vector *vec, const void *elem );
 /// \param vec Vector to pop out
 /// \param ptr_retrieve Pointer to retrieve the result
 ///
-void
-erap_Vector_Pop_Front( erap_Vector *vec, void *ptr_retrieve );
+VOID
+erap_Vector_Pop_Front( erap_Vector *vec, VOID *ptr_retrieve );
 
 ///
 /// \brief Destroy a vector
@@ -264,7 +264,7 @@ erap_Vector_Pop_Front( erap_Vector *vec, void *ptr_retrieve );
 ///
 /// \param vec Vector to destroy
 ///
-void
+VOID
 erap_Vector_Destroy( erap_Vector *vec );
 
 #endif // !ERAP_LIB_CONTAINER_VECTOR_H

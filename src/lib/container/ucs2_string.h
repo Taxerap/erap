@@ -38,33 +38,33 @@ typedef struct erap_UCS2String
 } erap_UCS2String;
 
 erap_UCS2String *
-erap_UCS2String_Create( void );
+erap_UCS2String_Create( VOID );
 
 erap_UCS2String *
-erap_UCS2String_From( const CHAR16 *original );
+erap_UCS2String_From( CONST CHAR16 *original );
 
-void
+VOID
 erap_UCS2String_Expand( erap_UCS2String *str );
 
-void
+VOID
 erap_UCS2String_ExpandUntilOnce( erap_UCS2String *str, UINTN new_size );
 
-void
+VOID
 erap_UCS2String_ShrinkToFit( erap_UCS2String *str );
 
-void
+VOID
 erap_UCS2String_PushC( erap_UCS2String *str, CHAR16 data );
 
-void
-erap_UCS2String_PushS( erap_UCS2String *str, const CHAR16 *data );
+VOID
+erap_UCS2String_PushS( erap_UCS2String *str, CONST CHAR16 *data );
 
-void
-erap_UCS2String_Insert( erap_UCS2String *str, UINTN index, const CHAR16 *data );
+VOID
+erap_UCS2String_Insert( erap_UCS2String *str, UINTN index, CONST CHAR16 *data );
 
-void
+VOID
 erap_UCS2String_Clear( erap_UCS2String *str );
 
-void
+VOID
 erap_UCS2String_Destroy( erap_UCS2String *str );
 
 #endif // !ERAP_LIB_CONTAINER_UCS2_STRING_H

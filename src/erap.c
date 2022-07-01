@@ -29,6 +29,7 @@
 #include "lib/container/vector.h"
 
 #include <Guid/FileInfo.h>
+#include <Library/BaseLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Uefi.h>
@@ -61,9 +62,24 @@ erap_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
     Print(str->ptr);
     Print(u"length: %u, capacity: %u, counted characters: %u\n", str->length, str->capacity, erap_UCS2_StrLen(str->ptr));
 
+    erap_UCS2String_Clear(str);
+    erap_UCS2String_PushS(str, u"LOLOLOL");
+    CHAR16 *chr = erap_UCS2_StrChr(str->ptr, u'O');
+    CHAR16 *chr2 = erap_UCS2_StrChr(str->ptr, u'o');
+    CHAR16 *rchr = erap_UCS2_StrRChr(str->ptr, u'O');
+    CHAR16 *rchr2 = erap_UCS2_StrRChr(str->ptr, u'o');
+    Print(u"Chr index: %u, rchr index: %u, chr2 found?: %s rchr2 found?: %s\n", chr - str->ptr, rchr - str->ptr, chr2 ? u"Yes" : u"No", rchr2 ? u"Yes" : u"No");
+
+    erap_UCS2String_Clear(str);
+    erap_UCS2String_PushS(str, u"233333");
+    UINTN resu = 0;
+    StrDecimalToUintnS(str->ptr, NULL, &resu);
+    Print(u"Convert result: [%u]\n", resu);
+
     Print(u"String section done.\n");
 
     erap_Vector *vec = erap_Vector_Create(sizeof(INT32), NULL);
+    erap_Vector_Expand(vec);
     Print(u"Allocated vector at %p, vec->ptr: %p.\n", vec, vec->ptr);
 
     erap_Vector_Push(vec, &(INT32){ -1 });

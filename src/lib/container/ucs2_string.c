@@ -30,10 +30,9 @@
 #include <Library/UefiBootServicesTableLib.h>
 
 erap_UCS2String *
-erap_UCS2String_Create( void )
+erap_UCS2String_Create( VOID )
 {
-    erap_UCS2String *result = NULL;
-    gBS->AllocatePool(EfiLoaderData, sizeof(erap_UCS2String), (VOID **) &result);
+    erap_UCS2String *result = erap_Memory_Malloc(EfiLoaderData, sizeof(erap_UCS2String));
     result->length = 0;
     result->capacity = 0;
     result->ptr = NULL;
@@ -41,15 +40,14 @@ erap_UCS2String_Create( void )
 }
 
 erap_UCS2String *
-erap_UCS2String_From( const CHAR16 *original )
+erap_UCS2String_From( CONST CHAR16 *original )
 {
-    erap_UCS2String *result = NULL;
-    gBS->AllocatePool(EfiLoaderData, sizeof(erap_UCS2String), (VOID **) &result);
+    erap_UCS2String *result = erap_Memory_Malloc(EfiLoaderData, sizeof(erap_UCS2String));
 
     UINTN characters = erap_UCS2_StrLen(original);
-    gBS->AllocatePool(EfiLoaderData, (characters + 1) * sizeof(CHAR16), (VOID **) &(result->ptr));
-    gBS->CopyMem(result->ptr, (VOID *) original, characters * sizeof(CHAR16));
-    gBS->CopyMem(result->ptr + characters, &(CHAR16){ u'\0' }, sizeof(CHAR16));
+    result->ptr = erap_Memory_Malloc(EfiLoaderData, (characters + 1) * sizeof(CHAR16));
+    erap_Memory_MemCpy(result->ptr, original, characters * sizeof(CHAR16));
+    erap_Memory_MemCpy(result->ptr + characters, &(CHAR16){ u'\0' }, sizeof(CHAR16));
 
     result->length = characters;
     result->capacity = (characters + 1) * sizeof(CHAR16);
@@ -57,12 +55,12 @@ erap_UCS2String_From( const CHAR16 *original )
     return result;
 }
 
-void
+VOID
 erap_UCS2String_Expand( erap_UCS2String *str )
 {
     if (!str->capacity)
     {
-        gBS->AllocatePool(EfiLoaderData, sizeof(CHAR16), (VOID **) &(str->ptr));
+        str->ptr = erap_Memory_Malloc(EfiLoaderData, sizeof(CHAR16));
         str->capacity = sizeof(CHAR16);
     }
     else
@@ -72,14 +70,14 @@ erap_UCS2String_Expand( erap_UCS2String *str )
     }
 }
 
-void
+VOID
 erap_USC2String_ExpandUntil( erap_UCS2String *str, UINTN new_size )
 {
     while (str->capacity < new_size)
         erap_UCS2String_Expand(str);
 }
 
-void
+VOID
 erap_UCS2String_ShrinkToFit( erap_UCS2String *str )
 {
     if (str->capacity > str->length * sizeof(CHAR16) && str->length)
@@ -89,12 +87,12 @@ erap_UCS2String_ShrinkToFit( erap_UCS2String *str )
     }
     else if (str->capacity && !str->length)
     {
-        gBS->FreePool(str->ptr);
+        erap_Memory_Free(str->ptr);
         str->capacity = 0;
     }
 }
 
-void
+VOID
 erap_UCS2String_PushC( erap_UCS2String *str, CHAR16 data )
 {
     erap_USC2String_ExpandUntil(str, sizeof(CHAR16) * (str->length + 2));
@@ -102,17 +100,17 @@ erap_UCS2String_PushC( erap_UCS2String *str, CHAR16 data )
     str->ptr[str->length] = u'\0';
 }
 
-void
-erap_UCS2String_PushS( erap_UCS2String *str, const CHAR16 *data )
+VOID
+erap_UCS2String_PushS( erap_UCS2String *str, CONST CHAR16 *data )
 {
     UINTN target_length = erap_UCS2_StrLen(data);
     erap_USC2String_ExpandUntil(str, sizeof(CHAR16) * (str->length + target_length + 1));
-    gBS->CopyMem(str->ptr + str->length, (VOID *) data, sizeof(CHAR16) * (target_length + 1));
+    erap_Memory_MemCpy(str->ptr + str->length, data, sizeof(CHAR16) * (target_length + 1));
     str->length += target_length;
 }
 
-void
-erap_UCS2String_Insert( erap_UCS2String *str, UINTN index, const CHAR16 *data )
+VOID
+erap_UCS2String_Insert( erap_UCS2String *str, UINTN index, CONST CHAR16 *data )
 {
     if (index >= str->length)
         erap_UCS2String_PushS(str, data);
@@ -120,13 +118,13 @@ erap_UCS2String_Insert( erap_UCS2String *str, UINTN index, const CHAR16 *data )
     {
         UINTN target_length = erap_UCS2_StrLen(data);
         erap_USC2String_ExpandUntil(str, sizeof(CHAR16) * (str->length + target_length + 1));
-        gBS->CopyMem(str->ptr + index + target_length, str->ptr + index, sizeof(CHAR16) * (str->length - index + 1));
-        gBS->CopyMem(str->ptr + index, (VOID *) data, sizeof(CHAR16) * target_length);
+        erap_Memory_MemCpy(str->ptr + index + target_length, str->ptr + index, sizeof(CHAR16) * (str->length - index + 1));
+        erap_Memory_MemCpy(str->ptr + index, data, sizeof(CHAR16) * target_length);
         str->length += target_length;
     }
 }
 
-void
+VOID
 erap_UCS2String_Clear( erap_UCS2String *str )
 {
     if (str->length)
@@ -136,10 +134,10 @@ erap_UCS2String_Clear( erap_UCS2String *str )
     }
 }
 
-void
+VOID
 erap_UCS2String_Destroy( erap_UCS2String *str )
 {
     if (str->capacity)
-        gBS->FreePool(str->ptr);
-    gBS->FreePool(str);
+        erap_Memory_Free(str->ptr);
+    erap_Memory_Free(str);
 }

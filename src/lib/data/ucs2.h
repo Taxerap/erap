@@ -28,21 +28,21 @@
 #include <Uefi.h>
 
 UINTN
-erap_UCS2_StrLen( const CHAR16 *str );
+erap_UCS2_StrLen( CONST CHAR16 *str );
 
 INTN
-erap_UCS2_StrCmp( const CHAR16 *lhs, const CHAR16 *rhs );
+erap_UCS2_StrCmp( CONST CHAR16 *lhs, CONST CHAR16 *rhs );
 
 CHAR16 *
-erap_UCS2_StrChr( const CHAR16 *str, CHAR16 ch );
+erap_UCS2_StrChr( CONST CHAR16 *str, CHAR16 ch );
 
 CHAR16 *
-erap_UCS2_StrRChr( const CHAR16 *str, CHAR16 ch );
+erap_UCS2_StrRChr( CONST CHAR16 *str, CHAR16 ch );
 
 CHAR16 *
-erap_UCS2_StrStr( const CHAR16 *str, const CHAR16 *substr );
+erap_UCS2_StrStr( CONST CHAR16 *str, CONST CHAR16 *substr );
 
 CHAR16 *
-erap_UCS2_StrRStr( const CHAR16 *str, const CHAR16 *substr );
+erap_UCS2_StrRStr( CONST CHAR16 *str, CONST CHAR16 *substr );
 
 #endif // !ERAP_LIB_DATA_UCS2_H

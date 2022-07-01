@@ -25,12 +25,11 @@
 #ifndef ERAP_DEBUG_MEMORY_TYPE_H
 #define ERAP_DEBUG_MEMORY_TYPE_H
 
-#include <Library/UefiLib.h>
 #include <Uefi.h>
 
-static
+STATIC
 inline
-CHAR16 *
+CONST CHAR16 *CONST
 erap_GetMemoryTypeString( EFI_MEMORY_TYPE type )
 {
     switch (type)
