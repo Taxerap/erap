@@ -1,0 +1,25 @@
+[Defines]
+    INF_VERSION = 0x0001001B
+    MODULE_TYPE = UEFI_APPLICATION
+    BASE_NAME = erap_test
+    FILE_GUID = C58561B9-AF01-47DC-A86E-8268824D7C99
+    VERSION_STRING = "test"
+    ENTRY_POINT = erap_Test_Entry
+
+[Sources]
+    src/test.c
+    ../src/lib/container/ucs2_string.c
+    ../src/lib/container/vector.c
+    ../src/lib/data/memory.c
+    ../src/lib/data/ucs2.c
+
+[BuildOptions]
+    MSFT:*_*_*_CC_FLAGS = /I$(PLATFORM_DIR)/../src /I$(PLATFORM_DIR)/../vendor /std:c17
+    GCC:*_*_*_CC_FLAGS = -I$(PLATFORM_DIR)/../src -I$(PLATFORM_DIR)/../vendor -std=c17
+
+[Packages]
+    MdePkg/MdePkg.dec
+
+[LibraryClasses]
+    UefiApplicationEntryPoint
+    UefiLib
