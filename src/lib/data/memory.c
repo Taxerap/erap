@@ -42,7 +42,8 @@ erap_Memory_ReAlloc( EFI_MEMORY_TYPE type, UINTN preserve, VOID *old, UINTN new_
     VOID *result = NULL;
 
     gBS->AllocatePool(type, new_size, &result);
-    gBS->CopyMem(result, old, preserve);
+    if (preserve)
+        gBS->CopyMem(result, old, preserve);
     gBS->FreePool(old);
 
     return result;

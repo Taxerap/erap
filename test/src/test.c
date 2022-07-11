@@ -77,6 +77,7 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
     Print(u"Convert result: [%u]\n", resu);
 
     Print(u"String section done.\n");
+    erap_UCS2String_Destroy(str);
 
     erap_Vector *vec = erap_Vector_Create(sizeof(INT32), NULL);
     erap_Vector_Expand(vec);
@@ -99,7 +100,7 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
     erap_Vector_Walk(vec, printvec);
     Print(u"]\n");
 
-    erap_UCS2String_Destroy(str);
+    Print(u"Vector section done.\n");
     erap_Vector_Destroy(vec);
 
     EFI_STATUS status = EFI_SUCCESS;
@@ -108,25 +109,15 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
     UINTN memory_map_key = 0;
     UINTN memory_descriptor_sz = 0;
     UINT32 memory_descriptor_ver = 0;
-    EFI_MEMORY_DESCRIPTOR *memory_map = NULL;
-    status = gBS->AllocatePool(EfiLoaderData, memory_map_sz, (VOID **) &memory_map);
-    if (EFI_ERROR(status))
-    {
-        Print(L"Failed to allocate memory for memory map data.\n");
-        return status;
-    }
+    EFI_MEMORY_DESCRIPTOR *memory_map = erap_Memory_Malloc(EfiLoaderData, memory_map_sz);
 
-    status = gBS->GetMemoryMap(&memory_map_sz, memory_map, &memory_map_key, &memory_descriptor_sz, &memory_descriptor_ver);
-    if (status == EFI_BUFFER_TOO_SMALL)
+    while (TRUE)
     {
-        gBS->FreePool(memory_map);
-        status = gBS->AllocatePool(EfiLoaderData, memory_map_sz, (VOID **) &memory_map);
-        if (EFI_ERROR(status))
-        {
-            Print(L"Failed to allocate memory for memory map data.\n");
-            return status;
-        }
         status = gBS->GetMemoryMap(&memory_map_sz, memory_map, &memory_map_key, &memory_descriptor_sz, &memory_descriptor_ver);
+        if (status == EFI_BUFFER_TOO_SMALL)
+            memory_map = erap_Memory_ReAlloc(EfiLoaderData, 0, memory_map, memory_map_sz * 2);
+        else
+            break;
     }
     if (EFI_ERROR(status))
     {
@@ -135,9 +126,9 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
     }
     Print(L"Got %u maps of memory.\n", memory_map_sz / memory_descriptor_sz);
     Print(L"Descriptor Version: [%u].\n", memory_descriptor_ver);
+
     UINT8 *current_descriptor_addr = (UINT8 *) memory_map;
     UINT64 total_memory_sz = 0;
-
     Print(L"| Index | Type | Physical start | Virtual start | Number of Pages |\n");
     for (UINTN i = 0; i < memory_map_sz / memory_descriptor_sz; i++)
     {
@@ -189,15 +180,8 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
     }
     Print(L"Opened root directory.\n");
 
-    EFI_FILE_PROTOCOL *entry = NULL;
     UINTN entry_sz = sizeof(EFI_FILE_PROTOCOL);
-
-    status = gBS->AllocatePool(EfiLoaderData, entry_sz, (VOID **) &entry);
-    if (EFI_ERROR(status))
-    {
-        Print(L"Failed to allocate pool space for file entries!\n");
-        return status;
-    }
+    EFI_FILE_PROTOCOL *entry = erap_Memory_Malloc(EfiLoaderData, entry_sz);
 
     UINTN total_entries = 0;
     while (1)
@@ -208,13 +192,7 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
         if (status == EFI_BUFFER_TOO_SMALL)
         {
             Print(L"Buffer is too small. Reallocating...\n");
-            gBS->FreePool(entry);
-            status = gBS->AllocatePool(EfiLoaderData, entry_sz, (VOID **) &entry);
-            if (EFI_ERROR(status))
-            {
-                Print(L"Failed to allocate pool space for file entries!\n");
-                return status;
-            }
+            entry = erap_Memory_ReAlloc(EfiLoaderData, 0, entry, entry_sz);
             continue;
         }
         else if (EFI_ERROR(status))
@@ -223,13 +201,13 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
             return status;
         }
 
-        EFI_FILE_INFO *file_info = (EFI_FILE_INFO *)entry;
-        Print(L"Loaded a directory entry: %s which is %sa directory.\n", file_info->FileName, (file_info->Attribute & EFI_FILE_DIRECTORY) ? L"" : L"not ");
+        EFI_FILE_INFO *file_info = (EFI_FILE_INFO *) entry;
+        Print(L"Found a directory entry: [%s] which IS %sa directory.\n", file_info->FileName, (file_info->Attribute & EFI_FILE_DIRECTORY) ? L"" : L"NOT ");
         total_entries++;
     }
     Print(L"There are total %u entries.\n", total_entries);
 
-    gBS->FreePool(entry);
+    erap_Memory_Free(entry);
 
     Print(L"Done.\n");
     return EFI_SUCCESS;
