@@ -111,13 +111,12 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
     UINT32 memory_descriptor_ver = 0;
     EFI_MEMORY_DESCRIPTOR *memory_map = erap_Memory_Malloc(EfiLoaderData, memory_map_sz);
 
-    while (TRUE)
+    status = gBS->GetMemoryMap(&memory_map_sz, memory_map, &memory_map_key, &memory_descriptor_sz, &memory_descriptor_ver);
+    if (status == EFI_BUFFER_TOO_SMALL)
     {
+        Print(u"Buffer is too small. Reallocating... \n");
+        memory_map = erap_Memory_ReAlloc(EfiLoaderData, 0, memory_map, memory_map_sz);
         status = gBS->GetMemoryMap(&memory_map_sz, memory_map, &memory_map_key, &memory_descriptor_sz, &memory_descriptor_ver);
-        if (status == EFI_BUFFER_TOO_SMALL)
-            memory_map = erap_Memory_ReAlloc(EfiLoaderData, 0, memory_map, memory_map_sz * 2);
-        else
-            break;
     }
     if (EFI_ERROR(status))
     {
