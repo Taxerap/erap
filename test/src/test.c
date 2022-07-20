@@ -120,19 +120,19 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
     }
     if (EFI_ERROR(status))
     {
-        Print(L"Failed to get memory map: %u.\n", status);
+        Print(u"Failed to get memory map: %u.\n", status);
         return status;
     }
-    Print(L"Got %u maps of memory.\n", memory_map_sz / memory_descriptor_sz);
-    Print(L"Descriptor Version: [%u].\n", memory_descriptor_ver);
+    Print(u"Got %u maps of memory.\n", memory_map_sz / memory_descriptor_sz);
+    Print(u"Descriptor Version: [%u].\n", memory_descriptor_ver);
 
     UINT8 *current_descriptor_addr = (UINT8 *) memory_map;
     UINT64 total_memory_sz = 0;
-    Print(L"| Index | Type | Physical start | Virtual start | Number of Pages |\n");
+    Print(u"| Index | Type | Physical start | Virtual start | Number of Pages |\n");
     for (UINTN i = 0; i < memory_map_sz / memory_descriptor_sz; i++)
     {
         EFI_MEMORY_DESCRIPTOR *current_descriptor = (EFI_MEMORY_DESCRIPTOR *) current_descriptor_addr;
-        Print(L"| %-3u | %-30s | %016x | %016x | %-8u |\n", i,
+        Print(u"| %-3u | %-30s | %016x | %016x | %-8u |\n", i,
                                                             erap_GetMemoryTypeString(current_descriptor->Type),
                                                             current_descriptor->PhysicalStart,
                                                             current_descriptor->VirtualStart,
@@ -140,44 +140,44 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
         total_memory_sz += current_descriptor->NumberOfPages * 4096;
         current_descriptor_addr += memory_descriptor_sz;
     }
-    Print(L"Total memory: %u MiB.\n", total_memory_sz / (1024 * 1024));
+    Print(u"Total memory: %u MiB.\n", total_memory_sz / (1024 * 1024));
 
     UINTN handles_count = 0;
     EFI_HANDLE *handles_buffer = NULL;
     status = gBS->LocateHandleBuffer(ByProtocol, &gEfiSimpleFileSystemProtocolGuid, NULL, &handles_count, &handles_buffer);
     if (EFI_ERROR(status))
     {
-        Print(L"Failed to LocateHandleBuffer for <SimpleFileSystemProtocol>.");
+        Print(u"Failed to LocateHandleBuffer for <SimpleFileSystemProtocol>.\n");
         return status;
     }
-    Print(L"Grabbed %u handle(s) that support SimpleFileSystemProtocol.\n", handles_count);
+    Print(u"Grabbed %u handle(s) that support SimpleFileSystemProtocol.\n", handles_count);
 
-    EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *sfs;
-    status = gBS->OpenProtocol(handles_buffer[0], &gEfiSimpleFileSystemProtocolGuid, (VOID **)&sfs, image_handle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+    EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *sfs_protocol;
+    status = gBS->OpenProtocol(handles_buffer[0], &gEfiSimpleFileSystemProtocolGuid, (VOID **)&sfs_protocol, image_handle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
     if (EFI_ERROR(status))
     {
-        Print(L"Failed to open SimpleFileSystemProtocol.\n");
+        Print(u"Failed to open SimpleFileSystemProtocol.\n");
         return status;
     }
-    Print(L"Opened SimpleFileSystemProtocol handle.\n");
+    Print(u"Opened SimpleFileSystemProtocol handle.\n");
 
     EFI_FILE_PROTOCOL *root_dir = NULL;
-    status = sfs->OpenVolume(sfs, &root_dir);
+    status = sfs_protocol->OpenVolume(sfs_protocol, &root_dir);
     if (EFI_ERROR(status))
     {
-        Print(L"Failed to open volume.\n");
+        Print(u"Failed to open volume.\n");
         return status;
     }
-    Print(L"Opened a volume.\n");
+    Print(u"Opened a volume.\n");
 
     EFI_FILE_PROTOCOL *file_handle = NULL;
-    status = root_dir->Open(root_dir, &file_handle, L"\\", EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
+    status = root_dir->Open(root_dir, &file_handle, u"\\", EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
     if (EFI_ERROR(status))
     {
-        Print(L"Failed to open directory.\n");
+        Print(u"Failed to open directory.\n");
         return status;
     }
-    Print(L"Opened root directory.\n");
+    Print(u"Opened root directory.\n");
 
     UINTN entry_sz = sizeof(EFI_FILE_PROTOCOL);
     EFI_FILE_PROTOCOL *entry = erap_Memory_Malloc(EfiLoaderData, entry_sz);
@@ -190,21 +190,21 @@ erap_Test_Entry( IN EFI_HANDLE image_handle, IN EFI_SYSTEM_TABLE *system_table )
             break;
         if (status == EFI_BUFFER_TOO_SMALL)
         {
-            Print(L"Buffer is too small. Reallocating...\n");
+            Print(u"Buffer is too small. Reallocating...\n");
             entry = erap_Memory_ReAlloc(EfiLoaderData, 0, entry, entry_sz);
             continue;
         }
         else if (EFI_ERROR(status))
         {
-            Print(L"Failed to open entry!\n");
+            Print(u"Failed to open entry!\n");
             return status;
         }
 
         EFI_FILE_INFO *file_info = (EFI_FILE_INFO *) entry;
-        Print(L"Found a directory entry: [%s] which IS %sa directory.\n", file_info->FileName, (file_info->Attribute & EFI_FILE_DIRECTORY) ? L"" : L"NOT ");
+        Print(u"Found a directory entry: [%s] which IS %sa directory.\n", file_info->FileName, (file_info->Attribute & EFI_FILE_DIRECTORY) ? u"" : u"NOT ");
         total_entries++;
     }
-    Print(L"There are total %u entries.\n", total_entries);
+    Print(u"There are total %u entries.\n", total_entries);
 
     erap_Memory_Free(entry);
 
